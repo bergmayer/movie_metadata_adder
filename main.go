@@ -59,6 +59,9 @@ func main() {
 
 	searchEntry = widget.NewEntry()
 	searchEntry.SetPlaceHolder("Enter movie title to search...")
+	searchEntry.OnSubmitted = func(string) {
+		performSearch(false) // Manual search triggered by Enter key
+	}
 	searchEntry.Disable()
 
 	searchButton = widget.NewButton("Search TMDB", func() {
