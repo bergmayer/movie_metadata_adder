@@ -1,0 +1,40 @@
+# Binaries
+movie_metadata_adder
+movie_metadata_adder.exe
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Test binaries
+*.test
+
+# Output of the go coverage tool
+*.out
+
+# Go workspace file
+go.work
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Claude Code
+.claude/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+temp_*
+*.tmp
+
+# Config files (contains API key)
+config.json
+
+# Old bash script (keep in repo but listed here for reference)
+# metadata_adder_for_movies_that_does_fuzzy_search.sh
