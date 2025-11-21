@@ -68,13 +68,13 @@ func UpdateMovieFile(filePath string, metadata MovieMetadata) (string, error) {
 	}
 
 	// 2. Stream mapping (after all inputs, before other options)
-	// Map streams - uppercase V excludes attached_pic streams
-	args = append(args, "-map", "0:V?", "-map", "0:a?", "-map", "0:s?", "-map", "0:d?")
-
-	// Map the poster if we have one
+	// Map the poster FIRST if we have one (so it becomes output v:0)
 	if len(metadata.Poster) > 0 {
 		args = append(args, "-map", "1:v")
 	}
+
+	// Then map streams from original file - uppercase V excludes attached_pic streams
+	args = append(args, "-map", "0:V?", "-map", "0:a?", "-map", "0:s?", "-map", "0:d?")
 
 	// Add metadata
 	if metadata.Title != "" {
@@ -98,12 +98,9 @@ func UpdateMovieFile(filePath string, metadata MovieMetadata) (string, error) {
 	args = append(args, "-c", "copy")
 
 	// If we have a poster, mark it as attached_pic
+	// Since we mapped it first, it's always output stream v:0
 	if len(metadata.Poster) > 0 {
-		// Set disposition for streams from input 1 (the poster)
-		// First, clear attached_pic disposition from all video streams
-		args = append(args, "-disposition:v", "0")
-		// Then set attached_pic for streams from input 1
-		args = append(args, "-disposition:1:v", "attached_pic")
+		args = append(args, "-disposition:v:0", "attached_pic")
 	}
 
 	args = append(args, "-y", tempFile)
