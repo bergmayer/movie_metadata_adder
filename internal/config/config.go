@@ -25,7 +25,7 @@ func GetConfigDir() (string, error) {
 		}
 		configDir = filepath.Join(home, "Library", "Application Support", "MovieMetadataAdder")
 	case "linux":
-		// Linux (including WSL): XDG_CONFIG_HOME or ~/.config/MovieMetadataAdder
+		// Linux: XDG_CONFIG_HOME or ~/.config/MovieMetadataAdder
 		if xdgConfig := os.Getenv("XDG_CONFIG_HOME"); xdgConfig != "" {
 			configDir = filepath.Join(xdgConfig, "MovieMetadataAdder")
 		} else {
@@ -35,6 +35,17 @@ func GetConfigDir() (string, error) {
 			}
 			configDir = filepath.Join(home, ".config", "MovieMetadataAdder")
 		}
+	case "windows":
+		// Windows: %APPDATA%\MovieMetadataAdder
+		appData := os.Getenv("APPDATA")
+		if appData == "" {
+			home, err := os.UserHomeDir()
+			if err != nil {
+				return "", err
+			}
+			appData = filepath.Join(home, "AppData", "Roaming")
+		}
+		configDir = filepath.Join(appData, "MovieMetadataAdder")
 	default:
 		return "", fmt.Errorf("unsupported platform: %s", runtime.GOOS)
 	}

@@ -33,7 +33,7 @@ A cross-platform GUI application for adding metadata to movie files using The Mo
 - **Automatic File Renaming** - Renames files to Plex-compatible format: `Title (Year).ext`
 - **In-Place Processing** - Original file is replaced with the metadata-enriched version
 - **Secure API Key Storage** - API keys stored following platform conventions (see [Configuration](#configuration-and-data-storage))
-- **Cross-Platform** - Works on macOS and Linux
+- **Cross-Platform** - Works on macOS, Linux, and Windows
 
 ## Prerequisites
 
@@ -43,7 +43,7 @@ A cross-platform GUI application for adding metadata to movie files using The Mo
    - **macOS**: `brew install ffmpeg`
    - **Linux (Debian/Ubuntu)**: `sudo apt install ffmpeg`
    - **Linux (RHEL/Fedora)**: `sudo dnf install ffmpeg`
-   - **WSL**: Use Linux installation method above (works with WSL2)
+   - **Windows**: `choco install ffmpeg` (via Chocolatey) or download from [ffmpeg.org](https://ffmpeg.org/download.html)
 
 2. **TMDB API Key** - Free API key from The Movie Database
    - Sign up at [themoviedb.org](https://www.themoviedb.org/signup)
@@ -62,6 +62,7 @@ Download the pre-built binary for your platform from the releases page.
 
 ### Building from Source
 
+**macOS/Linux:**
 ```bash
 # Clone or download the source code
 cd movie_metadata_adder
@@ -71,6 +72,19 @@ go mod download
 
 # Build the application
 go build -o movie_metadata_adder
+```
+
+**Windows:**
+```powershell
+# Clone or download the source code
+cd movie_metadata_adder
+
+# Download dependencies
+go mod download
+
+# Build the application (hides console window)
+$env:CC = "gcc"
+go build -ldflags "-H windowsgui" -o movie_metadata_adder.exe
 ```
 
 ## Usage
@@ -142,7 +156,7 @@ Configuration files (including your TMDB API key) are stored in:
 
 - **macOS**: `~/Library/Application Support/MovieMetadataAdder/`
 - **Linux**: `$XDG_CONFIG_HOME/MovieMetadataAdder/` (or `~/.config/MovieMetadataAdder/` if XDG_CONFIG_HOME is not set)
-  - **WSL**: Same as Linux (`~/.config/MovieMetadataAdder/` in your WSL home)
+- **Windows**: `%APPDATA%\MovieMetadataAdder\`
 
 ### Configuration File
 
