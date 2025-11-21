@@ -40,7 +40,9 @@ func main() {
 	// Load config
 	var err error
 	cfg, err = config.Load()
-	if err != nil {
+	if err != nil || cfg == nil {
+		// Initialize empty config if loading failed
+		cfg = &config.Config{}
 		dialog.ShowError(fmt.Errorf("failed to load config: %v", err), myWindow)
 	}
 
