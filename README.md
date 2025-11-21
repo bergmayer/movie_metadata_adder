@@ -28,7 +28,7 @@ A cross-platform GUI application for adding metadata to movie files using The Mo
 - **Automatic File Renaming** - Renames files to Plex-compatible format: `Title (Year).ext`
 - **In-Place Processing** - Original file is replaced with the metadata-enriched version
 - **Secure API Key Storage** - API keys stored following platform conventions (see [Configuration Storage](#configuration-storage))
-- **Cross-Platform** - Works on macOS, Linux, and Windows
+- **Cross-Platform** - Works on macOS, Linux, and Windows (Linux: Tested on KDE Plasma; drag-and-drop not supported in all environments)
 
 ## Prerequisites
 
