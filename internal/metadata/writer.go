@@ -19,6 +19,26 @@ type MovieMetadata struct {
 	Poster   []byte
 }
 
+// sanitizeFilename removes characters that are invalid in Windows filenames
+func sanitizeFilename(name string) string {
+	// Replace invalid Windows filename characters: < > : " / \ | ? *
+	var result strings.Builder
+	for _, char := range name {
+		switch char {
+		case '<', '>', '/', '\\', '|', '?', '*':
+			result.WriteRune('_')
+		case ':':
+			result.WriteString(" -") // Replace colon with space-dash for better readability
+		case '"':
+			result.WriteRune('\'')
+		default:
+			result.WriteRune(char)
+		}
+	}
+
+	return result.String()
+}
+
 // UpdateMovieFile updates a movie file with metadata and renames it
 func UpdateMovieFile(filePath string, metadata MovieMetadata) (string, error) {
 	// Check if ffmpeg is available
@@ -87,7 +107,9 @@ func UpdateMovieFile(filePath string, metadata MovieMetadata) (string, error) {
 	}
 
 	// Generate new filename in Plex format: "Title (Year).ext"
-	newName := fmt.Sprintf("%s (%s)%s", metadata.Title, metadata.Year, ext)
+	// Sanitize title for Windows (remove invalid characters: < > : " / \ | ? *)
+	sanitizedTitle := sanitizeFilename(metadata.Title)
+	newName := fmt.Sprintf("%s (%s)%s", sanitizedTitle, metadata.Year, ext)
 	newPath := filepath.Join(dir, newName)
 
 	// Remove original file
