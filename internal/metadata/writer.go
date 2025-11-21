@@ -53,6 +53,9 @@ func UpdateMovieFile(filePath string, metadata MovieMetadata) (string, error) {
 	// Build ffmpeg command
 	args := []string{"-i", filePath}
 
+	// Map streams - uppercase V excludes attached_pic streams
+	args = append(args, "-map", "0:V?", "-map", "0:a?", "-map", "0:s?", "-map", "0:d?")
+
 	// If we have a poster, save it temporarily and add it
 	var posterPath string
 	if len(metadata.Poster) > 0 {
@@ -62,13 +65,8 @@ func UpdateMovieFile(filePath string, metadata MovieMetadata) (string, error) {
 		}
 		defer os.Remove(posterPath)
 
-		args = append(args, "-i", posterPath)
-		// Map video, audio, and subtitle streams from input 0 (excludes existing artwork)
-		// Then map the new poster from input 1
-		args = append(args, "-map", "0:v", "-map", "0:a?", "-map", "0:s?", "-map", "1")
-	} else {
-		// No poster, but still exclude any existing attached pictures
-		args = append(args, "-map", "0:v", "-map", "0:a?", "-map", "0:s?")
+		// Add the poster as second input
+		args = append(args, "-i", posterPath, "-map", "1:v")
 	}
 
 	// Add metadata
@@ -89,12 +87,16 @@ func UpdateMovieFile(filePath string, metadata MovieMetadata) (string, error) {
 		args = append(args, "-metadata", fmt.Sprintf("genre=%s", metadata.Genres))
 	}
 
-	// Copy streams
+	// Copy all streams
 	args = append(args, "-c", "copy")
 
-	// If we have a poster, set it as attached pic
+	// If we have a poster, mark it as attached_pic
 	if len(metadata.Poster) > 0 {
-		args = append(args, "-c:v:1", "png", "-disposition:v:1", "attached_pic")
+		// Set disposition for streams from input 1 (the poster)
+		// First, clear attached_pic disposition from all video streams
+		args = append(args, "-disposition:v", "0")
+		// Then set attached_pic for streams from input 1
+		args = append(args, "-disposition:1:v", "attached_pic")
 	}
 
 	args = append(args, "-y", tempFile)
