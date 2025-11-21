@@ -147,7 +147,14 @@ func main() {
 }
 
 func handleFileDrop(uri fyne.URI) {
+	// Get the file path - on Windows, use String() and strip file:/// prefix
 	filePath := uri.Path()
+
+	// On Windows, uri.Path() might return /C:/path instead of C:/path
+	// Strip leading slash if it looks like a Windows path
+	if len(filePath) > 2 && filePath[0] == '/' && filePath[2] == ':' {
+		filePath = filePath[1:]
+	}
 
 	// Validate file type
 	if !isValidVideoFile(filePath) {
