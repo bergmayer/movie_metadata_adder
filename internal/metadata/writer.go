@@ -50,13 +50,11 @@ func UpdateMovieFile(filePath string, metadata MovieMetadata) (string, error) {
 	dir := filepath.Dir(filePath)
 	tempFile := filepath.Join(dir, "temp_metadata"+ext)
 
-	// Build ffmpeg command
+	// Build ffmpeg command - order matters!
+	// 1. Input files first
 	args := []string{"-i", filePath}
 
-	// Map streams - uppercase V excludes attached_pic streams
-	args = append(args, "-map", "0:V?", "-map", "0:a?", "-map", "0:s?", "-map", "0:d?")
-
-	// If we have a poster, save it temporarily and add it
+	// If we have a poster, save it temporarily and add as second input
 	var posterPath string
 	if len(metadata.Poster) > 0 {
 		posterPath = filepath.Join(dir, "temp_poster.jpg")
@@ -66,7 +64,16 @@ func UpdateMovieFile(filePath string, metadata MovieMetadata) (string, error) {
 		defer os.Remove(posterPath)
 
 		// Add the poster as second input
-		args = append(args, "-i", posterPath, "-map", "1:v")
+		args = append(args, "-i", posterPath)
+	}
+
+	// 2. Stream mapping (after all inputs, before other options)
+	// Map streams - uppercase V excludes attached_pic streams
+	args = append(args, "-map", "0:V?", "-map", "0:a?", "-map", "0:s?", "-map", "0:d?")
+
+	// Map the poster if we have one
+	if len(metadata.Poster) > 0 {
+		args = append(args, "-map", "1:v")
 	}
 
 	// Add metadata
